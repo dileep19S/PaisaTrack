@@ -1,0 +1,249 @@
+
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Transaction History')}"></head>
+
+<body>
+
+<header th:replace="~{fragments/layout :: topbar(${activeTab})}"></header>
+
+<main class="app-main">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Transaction History</h1>
+            <p class="page-subtitle">
+                Filter by income, expense, or month and manage your records.
+            </p>
+        </div>
+
+        <a th:href="@{/transactions/new}" class="btn btn-primary btn-sm">
+            + Add Transaction
+        </a>
+    </div>
+
+    <!-- Success and Error Messages -->
+    <div th:if="${successMessage}"
+         class="alert alert-success"
+         th:text="${successMessage}">
+    </div>
+
+    <div th:if="${errorMessage}"
+         class="alert alert-error"
+         th:text="${errorMessage}">
+    </div>
+
+    <!-- Filter Bar -->
+    <section class="card" style="margin-bottom: 16px;">
+
+        <form th:action="@{/transactions}"
+              method="get"
+              class="filter-bar"
+              id="historyFilterForm">
+
+            <!-- Transaction Type -->
+            <div class="filter-field">
+
+                <label class="form-label" for="typeFilter">
+                    Transaction Type
+                </label>
+
+                <select id="typeFilter"
+                        name="type"
+                        class="form-control"
+                        onchange="this.form.requestSubmit()">
+
+                    <option value="ALL"
+                            th:selected="${selectedType == 'ALL'}">
+                        All Transactions
+                    </option>
+
+                    <option value="INCOME"
+                            th:selected="${selectedType == 'INCOME'}">
+                        Income Only
+                    </option>
+
+                    <option value="EXPENSE"
+                            th:selected="${selectedType == 'EXPENSE'}">
+                        Expense Only
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- Month Filter -->
+            <div class="filter-field">
+
+                <label class="form-label" for="monthFilter">
+                    Month
+                </label>
+
+                <input id="monthFilter"
+                       name="month"
+                       type="month"
+                       class="form-control"
+                       th:value="${selectedMonth}" />
+
+            </div>
+
+            <!-- Filter Buttons -->
+            <div style="display: flex; gap: 8px; align-items: end;">
+
+                <button type="submit" class="btn btn-primary">
+                    Apply Filter
+                </button>
+
+                <a th:href="@{/transactions}" class="btn btn-outline">
+                    Reset
+                </a>
+
+            </div>
+
+        </form>
+
+        <!-- Filtered Summary -->
+        <div class="kpi-grid" style="margin-bottom: 0;">
+
+            <div class="kpi-card">
+                <div class="kpi-label">Filtered Income</div>
+
+                <div class="kpi-value income tabular-nums"
+                     th:text="${@inr.format(filteredIncome)}">
+                    ₹0.00
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-label">Filtered Expenses</div>
+
+                <div class="kpi-value expense tabular-nums"
+                     th:text="${@inr.format(filteredExpense)}">
+                    ₹0.00
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- Transactions List -->
+    <section class="card">
+
+        <div class="card-header">
+
+            <h2 class="card-title"
+                th:text="'Records (' + ${#lists.size(transactions)} + ')'">
+                Records
+            </h2>
+
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(transactions)}"
+             class="empty-state">
+
+            <h3>No matching transactions found</h3>
+
+            <p>
+                Try clearing your filters or record a new transaction.
+            </p>
+
+            <a th:href="@{/transactions/new}"
+               class="btn btn-primary btn-sm">
+                + Add Transaction
+            </a>
+
+        </div>
+
+        <!-- Transaction Records -->
+        <div th:unless="${#lists.isEmpty(transactions)}"
+             class="tx-list">
+
+            <div class="tx-row" th:each="tx : ${transactions}">
+
+                <div class="tx-left">
+
+                    <div class="tx-icon"
+                         th:classappend="${tx.type.name() == 'INCOME'} ? ' income' : ' expense'"
+                         th:text="${tx.type.name() == 'INCOME'} ? '+' : '-'">
+                        -
+                    </div>
+
+                    <div class="tx-info">
+
+                        <div class="tx-title"
+                             th:text="${tx.description != null ? tx.description : tx.categoryName}">
+                            Category
+                        </div>
+
+                        <div class="tx-meta">
+
+                            <span th:text="${tx.categoryName}">
+                                Food
+                            </span>
+
+                            <span aria-hidden="true">·</span>
+
+                            <span th:text="${tx.formattedDate}">
+                                16-11-2026
+                            </span>
+
+                            <span aria-hidden="true">·</span>
+
+                            <span th:text="${tx.type.label}">
+                                Expense
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="tx-right">
+
+                    <span class="tx-amount tabular-nums"
+                          th:classappend="${tx.amountCssClass}"
+                          th:text="${tx.formattedSignedAmount}">
+                        -₹250.00
+                    </span>
+
+                    <div class="tx-actions">
+
+                        <a th:href="@{/transactions/edit/{id}(id=${tx.transactionId})}"
+                           class="tx-action-link">
+                            Edit
+                        </a>
+
+                        <form th:action="@{/transactions/delete/{id}(id=${tx.transactionId})}"
+                              method="post"
+                              data-confirm-delete="true"
+                              style="display: inline;">
+
+                            <button type="submit"
+                                    class="tx-action-link delete">
+                                Delete
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<!-- Bottom Navigation -->
+<div th:replace="~{fragments/layout :: bottomNav(${activeTab})}"></div>
+
+</body>
+</html>

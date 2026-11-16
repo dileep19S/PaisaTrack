@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Expense Analytics')}"></head>
+<body>
+
+<header th:replace="~{fragments/layout :: topbar(${activeTab})}"></header>
+
+<main class="app-main">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Expense Analytics</h1>
+      <p class="page-subtitle">Real-time spending insights calculated directly from MySQL.</p>
+    </div>
+  </div>
+
+  <!-- Analytics Filters -->
+  <section class="card" style="margin-bottom: 16px;">
+    <div class="filter-bar" style="margin-bottom: 0;">
+      <div class="filter-field">
+        <label class="form-label" for="analytics-month-filter">Category Breakdown Month</label>
+        <input id="analytics-month-filter" type="month" class="form-control"
+               th:value="${analytics.selectedMonth != 'ALL' ? analytics.selectedMonth : ''}" />
+      </div>
+
+      <div class="filter-field" style="display: flex; align-items: center; gap: 8px; padding-bottom: 10px;">
+        <input id="analytics-all-time" type="checkbox"
+               th:checked="${analytics.selectedMonth == 'ALL'}"
+               style="width: 18px; height: 18px; accent-color: #14532D;" />
+        <label for="analytics-all-time" style="font-size: 0.9rem; font-weight: 600; cursor: pointer;">
+          Show All-Time Category Totals
+        </label>
+      </div>
+
+      <div class="filter-field">
+        <label class="form-label" for="analytics-year-filter">Monthly Comparison Year</label>
+        <select id="analytics-year-filter" class="form-control">
+          <option th:each="yr : ${analytics.availableYears}"
+                  th:value="${yr}"
+                  th:text="${yr}"
+                  th:selected="${yr == analytics.selectedYear}">2026</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- Summary KPI Row -->
+  <section class="kpi-grid kpi-grid-3">
+    <div class="kpi-card">
+      <div class="kpi-label">Period Income</div>
+      <div id="analytics-kpi-income" class="kpi-value income tabular-nums"
+           th:text="${analytics.formattedTotalIncome}">₹0.00</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Period Expenses</div>
+      <div id="analytics-kpi-expense" class="kpi-value expense tabular-nums"
+           th:text="${analytics.formattedTotalExpense}">₹0.00</div>
+    </div>
+    <div class="kpi-card kpi-card-span">
+      <div class="kpi-label">Net Savings</div>
+      <div id="analytics-kpi-net" class="kpi-value tabular-nums"
+           th:text="${analytics.formattedNetBalance}">₹0.00</div>
+    </div>
+  </section>
+
+  <!-- Charts Grid -->
+  <section class="analytics-grid">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Category-Wise Expense Breakdown</h2>
+      </div>
+
+      <div class="chart-box">
+        <canvas id="categoryDoughnutChart" aria-label="Category Expense Breakdown Chart"></canvas>
+        <div id="category-empty-state" class="empty-state" hidden>
+          <h3>No expenses in this period</h3>
+          <p>Add an expense transaction to see category distribution.</p>
+        </div>
+      </div>
+
+      <div id="category-breakdown-list" class="breakdown-list"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Monthly Income vs Expense</h2>
+      </div>
+      <div class="chart-box" style="height: 360px;">
+        <canvas id="monthlyBarChart" aria-label="Monthly Income vs Expense Bar Chart"></canvas>
+        <div id="monthly-empty-state" class="empty-state" hidden>
+          <h3>No transactions in this year</h3>
+          <p>Record income or expenses to compare monthly cash flow.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div th:replace="~{fragments/layout :: bottomNav(${activeTab})}"></div>
+
+<script th:inline="javascript">
+  window.__PAISATRACK_ANALYTICS__ = /*[[${analytics}]]*/ null;
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script th:src="@{/js/analytics.js}"></script>
+
+</body>
+</html>

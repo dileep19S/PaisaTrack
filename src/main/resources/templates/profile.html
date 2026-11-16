@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Profile')}"></head>
+<body>
+
+<header th:replace="~{fragments/layout :: topbar(${activeTab})}"></header>
+
+<main class="app-main">
+  <div class="form-card">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Profile</h1>
+        <p class="page-subtitle">Your PaisaTrack account details.</p>
+      </div>
+    </div>
+
+    <section class="card" style="margin-bottom: 16px;">
+      <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 20px;">
+        <div class="brand-emblem" style="margin-bottom: 0;"
+             th:text="${#strings.substring(fullName, 0, 1).toUpperCase()}">U</div>
+        <div>
+          <h2 style="margin: 0; font-size: 1.15rem;" th:text="${fullName}">User Name</h2>
+          <p style="margin: 2px 0 0; font-size: 0.875rem; color: var(--text-muted);" th:text="${email}">user@example.com</p>
+        </div>
+      </div>
+
+      <div style="border-top: 1px solid var(--border); padding-top: 14px; display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem;">
+        <div style="display: flex; justify-content: space-between; gap: 12px;">
+          <span style="color: var(--text-muted);">Full Name</span>
+          <strong th:text="${fullName}">User Name</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; gap: 12px;">
+          <span style="color: var(--text-muted);">Email Address</span>
+          <strong th:text="${email}">user@example.com</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; gap: 12px;">
+          <span style="color: var(--text-muted);">Member Since</span>
+          <strong th:text="${memberSince}">16-11-2026</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; gap: 12px;">
+          <span style="color: var(--text-muted);">Currency &amp; Time Zone</span>
+          <strong>INR (₹) · Asia/Kolkata</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="display: flex; flex-direction: column; gap: 10px;">
+      <button type="button" class="btn btn-secondary btn-block" data-pwa-install hidden>
+        Install PaisaTrack App
+      </button>
+
+      <form th:action="@{/logout}" method="post">
+        <button type="submit" class="btn btn-danger-outline btn-block">
+          Log Out
+        </button>
+      </form>
+    </section>
+  </div>
+</main>
+
+<div th:replace="~{fragments/layout :: bottomNav(${activeTab})}"></div>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Error')}"></head>
+<body class="auth-body">
+
+<main class="auth-wrapper">
+  <section class="auth-card" style="text-align: center;">
+    <div class="brand-emblem" style="margin: 0 auto 14px;">₹</div>
+    <h1 class="auth-title" th:text="${errorTitle != null ? errorTitle : 'Page Unavailable'}">Page Unavailable</h1>
+    <p class="auth-subtitle"
+       th:text="${errorMessage != null ? errorMessage : 'An unexpected error occurred. Please return to your dashboard.'}">
+      An unexpected error occurred.
+    </p>
+    <a th:href="@{/dashboard}" class="btn btn-primary btn-block">Return to Dashboard</a>
+  </section>
+</main>
+
+</body>
+</html>
